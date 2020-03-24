@@ -1,7 +1,5 @@
 #include "main.h"
 
-#include <cmath>
-
 #define NUM_BEAMS 33
 
 #define MIC_SEP 0.1    // distance between mics in m

@@ -26,16 +26,12 @@ void display_power(power_arr *power) {
         if ((*power)[ii] > max) max = (*power)[ii];
     }
 
-    printf("Beam powers for signal angle: %0.1f\n", (float)SIGNAL_ANGLE);
+    // visualize angle
     for (int jj = 0; jj < (NUM_BEAMS); ++jj) {
-        angle = 180 * ((float)jj / (float)(NUM_BEAMS - 1));
         if ((*power)[jj] == max) {
-            printf("%s", BOLDBLUE);
-            printf("%0.2f / %0.6lf\n", angle, (*power)[jj]);
-            printf("%s", RESET);
-        }
-        else {        
-            printf("%0.2f / %0.6lf\n", angle, (*power)[jj]);
+            angle = 180 * ((float)jj / (float)(NUM_BEAMS - 1));
+            printf("Truth Angle: %f // Measured Angle: %f\n", (float)SIGNAL_ANGLE, angle);
+            ascii_vis(&angle);
         }
     }
 }

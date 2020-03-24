@@ -82,7 +82,7 @@ def gen_test_data():
     mic_2 = 256 * np.cos(2 * np.pi * FREQ * t_series + phase_diff_rad)
 
     # display data
-    display_spectrum(mic_1, mic_2, incident_angle)
+#    display_spectrum(mic_1, mic_2, incident_angle)
 
     # save mic data to csv files
     fname_base = "test_data/mic_{}_ang_{}.txt"
