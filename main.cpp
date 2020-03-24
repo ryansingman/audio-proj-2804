@@ -23,14 +23,28 @@ void display_power(power_arr *power) {
     // find max power
     float max = 0;
     for (int ii = 0; ii < NUM_BEAMS; ++ii) {
-        if ((*power)[ii] > max) max = (*power)[ii];
+        if ((*power)[ii] > max) {
+            max = (*power)[ii];
+            angle = 180 * ((float)ii / (float)(NUM_BEAMS - 1));
+        }
+    }
+
+    // verify if result is correct (to closest beam)
+    bool correct = false;
+    float beam_spacing = 180. / (float)NUM_BEAMS;
+    if (std::abs(std::abs(TRUTH_SIGNAL_ANGLE) - std::abs(angle)) < beam_spacing) {
+        correct = true;
     }
 
     // visualize angle
     for (int jj = 0; jj < (NUM_BEAMS); ++jj) {
         if ((*power)[jj] == max) {
-            angle = 180 * ((float)jj / (float)(NUM_BEAMS - 1));
-            printf("Truth Angle: %f // Measured Angle: %f\n", (float)SIGNAL_ANGLE, angle);
+            if (correct) {
+                printf("%s", BOLDGREEN);
+            }
+            else printf("%s", BOLDRED);
+            printf("Truth Angle: %f // Measured Angle: %f\n", (float)TRUTH_SIGNAL_ANGLE, angle);
+            printf("%s", RESET);
             ascii_vis(&angle);
         }
     }
