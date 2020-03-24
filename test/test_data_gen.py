@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 FREQ = 1000                 # signal frequency
 NUM_SAMPS = 256             # number of samples to generate
 NUM_FFT_POINTS = 256
-NUM_BEAMS = 33
 SAMP_FREQ = 9600            # sampling frequency (in Hz)
 T_STEP = 1 / SAMP_FREQ      # time step (in s)
 
@@ -38,22 +37,31 @@ def get_phase_diff():
 
     return incident_angle, (phase_diff * np.pi / 180.)
 
-def beamform(mic_1, mic_2):
+def display_spectrum(mic_1, mic_2, incident_angle):
 
     # take fft
     mic_1_fft = np.fft.rfft(mic_1, NUM_FFT_POINTS)
     mic_2_fft = np.fft.rfft(mic_2, NUM_FFT_POINTS)
 
     # generate weights
-    t_delays = np.cos(np.radians(np.arange(0, 180, 180./NUM_BEAMS))) * MIC_SEP * SOUND_SPEED
     freq_series = np.arange(0, SAMP_FREQ/2, (SAMP_FREQ/(NUM_FFT_POINTS + 1)))
-    weights = np.exp(1j * 2 * np.pi * freq_series * t_delays)
 
-    # beamform 
-    bf_data = np.zeros((NUM_BEAMS, NUM_FFT_POINTS))
+    plt.plot(freq_series, np.angle(mic_1_fft) * 180 / np.pi, label='Mic 1')
+    plt.plot(freq_series, np.angle(mic_2_fft) * 180 / np.pi, label='Mic 2')
+    plt.title("Phase Spectrum for incident angle = {}".format(incident_angle))
+    plt.xlabel('Frequency (Hz)')
+    plt.ylabel('Phase (deg)')
+    plt.legend()
 
-    plt.plot(freq_series, np.abs(mic_1_fft) * 180 / np.pi)
-    plt.plot(freq_series, np.abs(mic_2_fft) * 180 / np.pi)
+    plt.show()
+
+    plt.plot(freq_series, np.log10(np.abs(mic_1_fft)), label='Mic 1')
+    plt.plot(freq_series, np.log10(np.abs(mic_2_fft)), label='Mic 2')
+    plt.title("Magnitude Spectrum for incident angle = {}".format(incident_angle))
+    plt.xlabel('Frequency (Hz)')
+    plt.ylabel('Magnitude (dB)')
+    plt.legend()
+
     plt.show()
 
 
@@ -73,11 +81,11 @@ def gen_test_data():
     mic_1 = 256 * np.cos(2 * np.pi * FREQ * t_series)
     mic_2 = 256 * np.cos(2 * np.pi * FREQ * t_series + phase_diff_rad)
 
-    # python beamformer
-#    beamform(mic_1, mic_2)
+    # display data
+    display_spectrum(mic_1, mic_2, incident_angle)
 
     # save mic data to csv files
-    fname_base = "test_data/mic_{}_ang_{}.dat"
+    fname_base = "test_data/mic_{}_ang_{}.txt"
     with open(fname_base.format(1, incident_angle), 'w'):
         np.savetxt(fname_base.format(1, incident_angle), mic_1, fmt='%d', delimiter=',')
     with open(fname_base.format(2, incident_angle), 'w'):

@@ -3,6 +3,7 @@ build:
 
 clean:
 	rm test/test_data/*
+	rm main
 
 run:
 	./main
