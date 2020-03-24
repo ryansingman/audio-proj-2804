@@ -32,7 +32,7 @@ void generate_weights(weight_arr *weights, freq_arr *freqs, time_del_arr *t_dela
     for (int ii = 0; ii < NUM_PHONES; ++ii) {
         for (int jj = 0; jj < NUM_BEAMS; ++jj) {
             for (int kk = 0; kk < (NUM_FFT_POINTS/2) + 1; ++kk) {
-                (*weights)[ii][jj][kk] = std::exp(std::complex<double>(0.0, 2 * M_PI * (*freqs)[kk] * (*t_delays)[ii][jj]));
+                (*weights)[ii][jj][kk] = std::exp(std::complex<double>(0.0, -2 * M_PI * (*freqs)[kk] * (*t_delays)[ii][jj]));
             }
         }
     }

@@ -25,7 +25,7 @@ void display_power(power_arr *power) {
     for (int ii = 0; ii < NUM_BEAMS; ++ii) {
         if ((*power)[ii] > max) {
             max = (*power)[ii];
-            angle = 180 * ((float)ii / (float)(NUM_BEAMS - 1));
+            angle = 180 * ((float)(NUM_BEAMS - 1 - ii) / (float)(NUM_BEAMS - 1));
         }
     }
 
