@@ -9,4 +9,6 @@
 #define BOLDGREEN "\033[1m\033[32m"
 #define RESET "\033[0m"
 
+#define PIXEL_RATIO 0.7
+
 void ascii_vis(float *beam_dir);

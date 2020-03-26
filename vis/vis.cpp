@@ -10,38 +10,38 @@ void ascii_vis(float *look_dir) {
     float look_dir_rad = ((*look_dir) * M_PI / 180.) + 0.000000001;     // pad to adjust for undefined behavior at 0, 180
 
     // get terminal size
-    int num_row, num_col;
+    int num_row, num_col, num_x_pix, num_y_pix;
     struct winsize size;
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &size);
 
     num_row = size.ws_row - 2;      // reserve final row for next terminal line and top row for test status
     num_col = size.ws_col - 1;      // reserve final column for newline char
-
+    
     // create bool matrix
     bool bool_mat[num_row][num_col] = { {0} };        // initialize bool matrix with zeros
-    int origin_x = num_col / 2, origin_y = num_row;
+    int origin_x = (num_col) / 2, origin_y = num_row;
     bool_mat[origin_y][origin_x] = 1;
 
     // fill out character matrix
     int row_idx = origin_y, col_idx = origin_x;
     int r = 1;  // radius
     while (((num_row >= row_idx) && (row_idx > 0)) && ((num_col > col_idx) && (col_idx > 0))) {
-        row_idx = origin_y - (r * sin(look_dir_rad));
+        row_idx = origin_y - (r * sin(look_dir_rad))*PIXEL_RATIO;
         col_idx = origin_x + (r * cos(look_dir_rad));
         bool_mat[row_idx][col_idx] = 1;
         r++;
     }
 
     // print out ascii art 
+    printf("%s", BOLDBLUE);
     for (int ii = 0; ii < num_row; ii++) {
         for (int jj = 0; jj < num_col; jj++) {
             if (bool_mat[ii][jj]) {
-                printf("%s", BOLDBLUE);
                 printf("*");
-                printf("%s", RESET);
             }
             else printf(" ");
         }
         printf("\n");
     }
+    printf("%s", RESET);
 }
