@@ -16,38 +16,35 @@ void read_mic_data(double **mic_data, FILE *mic_data_file) {
     }
 }
 
-void display_power(power_arr *power) {
+void display_angle(beam_arr *beams, int max_power_idx) {
 
-    float angle = 0;
+    float angle = (*beams)[max_power_idx] * 180 / M_PI;
+    float beam_spacing;
 
-    // find max power
-    float max = 0;
-    for (int ii = 0; ii < NUM_BEAMS; ++ii) {
-        if ((*power)[ii] > max) {
-            max = (*power)[ii];
-            angle = 180 * ((float)(NUM_BEAMS - 1 - ii) / (float)(NUM_BEAMS - 1));
-        }
+    if (max_power_idx == 0) {
+        beam_spacing = ((*beams)[1] - (*beams)[0]) * 180. / M_PI;
     }
-
+    else if (max_power_idx == NUM_BEAMS) {
+        beam_spacing = ((*beams)[NUM_BEAMS] - (*beams)[NUM_BEAMS - 1]) * 180. / M_PI;
+    }
+    else {
+        beam_spacing = ((*beams)[max_power_idx + 1] - (*beams)[max_power_idx - 1]) * 180. / (2 *M_PI);
+    }
+        
     // verify if result is correct (to closest beam)
     bool correct = false;
-    float beam_spacing = 180. / (float)NUM_BEAMS;
     if (std::abs(std::abs(TRUTH_SIGNAL_ANGLE) - std::abs(angle)) < beam_spacing) {
         correct = true;
     }
 
     // visualize angle
-    for (int jj = 0; jj < (NUM_BEAMS); ++jj) {
-        if ((*power)[jj] == max) {
-            if (correct) {
-                printf("%s", BOLDGREEN);
-            }
-            else printf("%s", BOLDRED);
-            printf("Truth Angle: %f // Measured Angle: %f\n", (float)TRUTH_SIGNAL_ANGLE, angle);
-            printf("%s", RESET);
-            ascii_vis(&angle);
-        }
+    if (correct) {
+        printf("%s", BOLDGREEN);
     }
+    else printf("%s", BOLDRED);
+    printf("Truth Angle: %f // Measured Angle: %f\n", (float)TRUTH_SIGNAL_ANGLE, angle);
+    printf("%s", RESET);
+    ascii_vis(&angle);
 }
 
 int main(void) {
@@ -69,29 +66,34 @@ int main(void) {
     fft(&mic_2_fft_data, &mic_2_data);
 
     // place fft data in elem arr
-    elem_arr elem_data = { {0} };
-    memcpy(elem_data[0], mic_1_fft_data, sizeof(elem_arr) / 2);
-    memcpy(elem_data[1], mic_2_fft_data, sizeof(elem_arr) / 2);
+    elem_arr *elem_data = (elem_arr *) malloc(sizeof(elem_arr));;
+    memset(elem_data, 0, sizeof(elem_arr));
+    memcpy((*elem_data)[0], mic_1_fft_data, sizeof(elem_arr) / 2);
+    memcpy((*elem_data)[1], mic_2_fft_data, sizeof(elem_arr) / 2);
 
     // generate weights
-    time_del_arr t_delays =   { {0} };
-    freq_arr freqs        =     {0};
-    weight_arr weights    = { { {1} } };
+    beam_arr *beams  = (beam_arr *) malloc(sizeof(beam_arr));
+    time_del_arr *t_delays = (time_del_arr *) malloc(sizeof(time_del_arr));
+    memset(t_delays, 0, sizeof(time_del_arr));
+    freq_arr *freqs = (freq_arr *) malloc(sizeof(freq_arr));
+    weight_arr *weights = (weight_arr *) malloc(sizeof(weight_arr));
+    memset(weights, 1, sizeof(weight_arr));
     
-    find_time_delays(&t_delays);
-    find_freqs(&freqs);
-    generate_weights(&weights, &freqs, &t_delays);
+    find_beams(beams);
+    find_time_delays(t_delays, beams);
+    find_freqs(freqs);
+    generate_weights(weights, freqs, t_delays);
 
     // beamform data
-    bf_arr bf_data = { {0} };
-    beamform_data(&bf_data, &elem_data, &weights);
+    bf_arr *bf_data = (bf_arr *) malloc(sizeof(bf_arr));
+    beamform_data(bf_data, elem_data, weights);
 
-    // find beam powers
-    power_arr power = {0};
-    find_beam_powers(&power, &bf_data);
+    // find signal beam
+    int max_power_idx;
+    find_signal_beam(&max_power_idx, bf_data);
 
-    // display beam powers 
-    display_power(&power);
+    // display angle 
+    display_angle(beams, max_power_idx);
 
     return 0;
 }
