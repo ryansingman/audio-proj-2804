@@ -1,11 +1,14 @@
 build:
-	g++ -o main main.cpp beamformer/beamformer.cpp fft/fft.cpp vis/vis.cpp -lfftw3 -lm -I . -I ./beamformer -I ./fft -I ./vis
+	g++ -o bin/main src/main.cpp src/beamformer/beamformer.cpp src/fft/fft.cpp src/vis/vis.cpp -lfftw3 -lm -I include/
 
 clean:
 	rm test/test_data/*
-	rm main
+	rm bin/main
 
 run:
-	./main
+	./bin/main
 
-.PHONY: build clean run
+test:
+	cd test; python3.5 test_data_gen.py sweep
+
+.PHONY: build clean run test

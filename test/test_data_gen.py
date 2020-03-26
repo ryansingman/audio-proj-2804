@@ -4,6 +4,8 @@ import matplotlib
 matplotlib.use('QT5Agg')
 import matplotlib.pyplot as plt
 
+import sys
+
 FREQ = 1000                 # signal frequency
 NUM_SAMPS = 256             # number of samples to generate
 NUM_FFT_POINTS = 256
@@ -13,16 +15,14 @@ T_STEP = 1 / SAMP_FREQ      # time step (in s)
 MIC_SEP = 0.1                # mic separation (in m)
 SOUND_SPEED = 343             # speed of sound (in m/s)
 
-def get_phase_diff():
+def get_phase_diff(incident_angle):
     """
     Gets phase angle from user input of incident angle
-    Returns:
+    Inputs:
         incident_angle -- incident angle of sound
+    Returns:
         phase_diff_rad -- phase difference between mics (in radians)
     """
-    # get incident angle from user input
-    incident_angle = input('Enter phase angle (in degrees): ')
-
     # assert that incident angle is a number
     try:
         incident_angle = float(incident_angle)
@@ -32,10 +32,9 @@ def get_phase_diff():
 
     t_delay = MIC_SEP * np.cos(np.radians(incident_angle)) / SOUND_SPEED
 
-    print(t_delay)
     phase_diff = 360 * FREQ * t_delay
 
-    return incident_angle, (phase_diff * np.pi / 180.)
+    return (phase_diff * np.pi / 180.)
 
 def display_spectrum(mic_1, mic_2, incident_angle):
 
@@ -65,14 +64,13 @@ def display_spectrum(mic_1, mic_2, incident_angle):
     plt.show()
 
 
-def gen_test_data():
+def gen_test_data(incident_angle):
     """
     Generates test data (to output files)
     """
     # get phase difference
-    incident_angle, phase_diff_rad = get_phase_diff()
+    phase_diff_rad = get_phase_diff(incident_angle)
     assert(phase_diff_rad is not None)
-    print(phase_diff_rad)
 
     # generate time series
     t_series = np.arange(0, NUM_SAMPS * T_STEP, T_STEP)
@@ -92,4 +90,8 @@ def gen_test_data():
         np.savetxt(fname_base.format(2, incident_angle), mic_2, fmt='%d', delimiter=',')
     
 if __name__ == '__main__':
-    gen_test_data()
+    if isinstance(sys.argv[1], str):
+        for ang in np.arange(0, 180, 0.5):
+            gen_test_data(ang)
+    else:
+        gen_test_data(sys.argv[1])
