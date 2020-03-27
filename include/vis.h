@@ -11,4 +11,4 @@
 
 #define PIXEL_RATIO 0.7
 
-void ascii_vis(float *beam_dir);
+void ascii_vis(float beam_dir);

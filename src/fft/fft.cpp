@@ -14,7 +14,6 @@ void fft(std::complex<double> **fft_data, double **in_data) {
                                            FFTW_ESTIMATE);
     fftw_execute(plan);
 
-    // free plan and in data
+    // free plan
     fftw_destroy_plan(plan);
-    free(*in_data);
 }

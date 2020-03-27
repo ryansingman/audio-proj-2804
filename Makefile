@@ -8,7 +8,4 @@ clean:
 run:
 	./bin/main
 
-test:
-	cd test; python3.5 test_data_gen.py sweep
-
-.PHONY: build clean run test
+.PHONY: build clean run

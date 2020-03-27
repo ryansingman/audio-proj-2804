@@ -1,13 +1,13 @@
 #include "vis.h"
 
-void ascii_vis(float *look_dir) {
+void ascii_vis(float look_dir) {
     /*
      * Creates ascii art representation of signal direction
      * Inputs:
      *      look_dir -- look direction of highest power beam
      */
     // convert look dir to radians
-    float look_dir_rad = ((*look_dir) * M_PI / 180.) + 0.000000001;     // pad to adjust for undefined behavior at 0, 180
+    float look_dir_rad = (look_dir * M_PI / 180.) + 0.000000001;     // pad to adjust for undefined behavior at 0, 180
 
     // get terminal size
     int num_row, num_col, num_x_pix, num_y_pix;

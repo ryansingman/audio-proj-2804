@@ -15,7 +15,7 @@
 #include "fft.h"
 #include "vis.h"
 
-#define TRUTH_SIGNAL_ANGLE 45
-
-#define MIC_1_FILENAME "./test/test_data/mic_1_ang_45.0.txt"
-#define MIC_2_FILENAME "./test/test_data/mic_2_ang_45.0.txt"
+// can test single angle by setting SWEEP_START = SWEEP_END
+#define SWEEP_START 45
+#define SWEEP_END 135
+#define SWEEP_STEP 0.5
