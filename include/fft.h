@@ -5,4 +5,7 @@
 // window weights
 #define A0 0.53836
 
-void fft(std::complex<double> **fft_data, double **in_data);
+typedef std::complex<double> fft_series[NUM_FFT_POINTS/2 + 1];
+typedef fft_series* fft_arr[NUM_PHONES];
+
+void fft(fft_arr *fft_data, time_arr *mic_data);

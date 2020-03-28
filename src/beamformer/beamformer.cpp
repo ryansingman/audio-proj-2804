@@ -70,12 +70,12 @@ void generate_weights(weight_arr *weights, freq_arr *freqs, time_del_arr *t_dela
     }
 }
 
-void beamform_data(bf_arr *bf_data, elem_arr *elem_data, weight_arr *weights) {
+void beamform_data(bf_arr *bf_data, fft_arr *fft_data, weight_arr *weights) {
     /*
      * Beamforms data using complex exponential phase shifting
      * Inputs:
      *   bf_data -- array of beamformed data to fill in
-     *   elem_data -- element data (in frequency-domain)
+     *   fft_data -- element data (in frequency-domain)
      *   weights -- weight array of complex exponential weights
      */
    
@@ -85,7 +85,7 @@ void beamform_data(bf_arr *bf_data, elem_arr *elem_data, weight_arr *weights) {
         for (int jj = 0; jj < NUM_BEAMS; ++jj) {
             // iterate thru fft points
             for (int kk = 0; kk < (NUM_FFT_POINTS/2) + 1; ++kk) { 
-                (*bf_data)[jj][kk] += (*weights)[ii][jj][kk] * (*elem_data)[ii][kk];
+                (*bf_data)[jj][kk] += (*weights)[ii][jj][kk] * (*(*fft_data)[ii])[kk];
            }
         }
     }

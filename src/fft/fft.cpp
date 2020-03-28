@@ -1,19 +1,25 @@
 #include "fft.h"
 
-void fft(std::complex<double> **fft_data, double **in_data) {
+void fft(fft_arr *fft_data, time_arr *mic_data) {
 
-    // window in data (hamming window)
-    for (int ii = 0; ii < NUM_SAMPS; ii++) {
-        (*in_data)[ii] *= A0 - (1-A0)*cos((2 * M_PI * ii)/NUM_SAMPS);        
+    for (int ii = 0; ii < NUM_PHONES; ++ii) {
+
+        // window in data (hamming window)
+        for (int jj = 0; jj < NUM_SAMPS; ++jj) {
+            (*mic_data)[ii][jj] *= A0 - (1-A0)*cos((2 * M_PI * jj)/NUM_SAMPS);        
+        }
+
+        fftw_plan plan = fftw_plan_dft_r2c_1d(NUM_FFT_POINTS, 
+                                              (*mic_data)[ii], 
+                                              reinterpret_cast<fftw_complex *>(*(*fft_data)[ii]),
+                                              FFTW_ESTIMATE);
+
+        // plan fft
+        fftw_execute(plan);
+
+        // free plan
+        fftw_destroy_plan(plan);
+
     }
 
-    // plan and execute fft
-    fftw_plan plan = fftw_plan_dft_r2c_1d(NUM_FFT_POINTS, 
-                                          *in_data, 
-                                           reinterpret_cast<fftw_complex *>(*fft_data), 
-                                           FFTW_ESTIMATE);
-    fftw_execute(plan);
-
-    // free plan
-    fftw_destroy_plan(plan);
 }

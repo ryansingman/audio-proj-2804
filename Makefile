@@ -8,4 +8,7 @@ clean:
 run:
 	./bin/main
 
-.PHONY: build clean run
+freq_sweep_gen:
+	cd test; python3.5 test_data_gen.py sweep
+
+.PHONY: build clean run freq_sweep_gen
