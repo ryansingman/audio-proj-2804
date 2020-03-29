@@ -47,6 +47,13 @@ bool is_correct(float signal_angle, float truth_angle, beam_arr *beams, int max_
     if (std::abs(std::abs(truth_angle) - std::abs(signal_angle)) < beam_spacing) {
         return true;
     }
+    // check for wraparound
+    else if (std::abs(std::abs(truth_angle - 360) - std::abs(signal_angle)) < beam_spacing) {
+        return true;
+    }
+    else if (std::abs(std::abs(truth_angle + 360) - std::abs(signal_angle)) < beam_spacing) {
+        return true;
+    }
     return false;
 
 }
@@ -75,10 +82,17 @@ int main(void) {
 
     beam_arr *beams  = (beam_arr *) malloc(sizeof(beam_arr));
     time_del_arr *t_delays = (time_del_arr *) malloc(sizeof(time_del_arr));
+    memset(t_delays, 0, sizeof(time_del_arr));
     freq_arr *freqs = (freq_arr *) malloc(sizeof(freq_arr));
     weight_arr *weights = (weight_arr *) malloc(sizeof(weight_arr));
 
     bf_arr *bf_data = (bf_arr *) malloc(sizeof(bf_arr));
+
+    // generate weights
+    find_beams(beams);
+    find_time_delays(t_delays, beams);
+    find_freqs(freqs);
+    generate_weights(weights, freqs, t_delays);
 
     int max_power_idx;
     float signal_angle;
@@ -90,14 +104,6 @@ int main(void) {
 
         // perform fft on data
         fft(fft_data, mic_data);
-
-        // generate weights
-        memset(t_delays, 0, sizeof(time_del_arr));
-        
-        find_beams(beams);
-        find_time_delays(t_delays, beams);
-        find_freqs(freqs);
-        generate_weights(weights, freqs, t_delays);
 
         // beamform data
         memset(bf_data, 0, sizeof(bf_arr));
@@ -115,13 +121,10 @@ int main(void) {
 
         if (!correct) {
             printf(BOLDRED "Test failed " RESET "at truth angle: %.2f ... returned %.2f\n", truth_angle, signal_angle);
-//            return -1;
+            return -1;
         }
-        else {
-            printf(BOLDGREEN "Test passed " RESET "at truth angle: %.2f ... returned %.2f\n", truth_angle, signal_angle);
-        }
-
     }
 
+    printf(BOLDGREEN "All tests passed\n" RESET);
     return 0;
 }

@@ -8,7 +8,8 @@ void find_beams(beam_arr *beams) {
      */
 
     for (int ii = 0; ii < NUM_BEAMS; ++ii) {
-        (*beams)[ii] = acos((double)(NUM_BEAMS/2 - ii) / (double)((NUM_BEAMS - 1)/2)); // angle vector is linear in cosine space
+        (*beams)[ii] = 2 * M_PI * (double) ii / (double) (NUM_BEAMS);
+//        (*beams)[ii] = acos((double)(NUM_BEAMS/2 - ii) / (double)((NUM_BEAMS - 1)/2)); // angle vector is linear in cosine space
     }
 }
 
@@ -21,14 +22,19 @@ void find_time_delays(time_del_arr *delays, beam_arr *beams) {
      */
 
     double angle;
+    int phone_idx;
 
     // iterate thru phones
-    for (int ii = 1; ii < NUM_PHONES; ++ii) {
-        // iterate thru beams
-        for (int jj = 0; jj < NUM_BEAMS; ++jj) {
-            angle = (*beams)[jj];
+    for (int ii_x = 0; ii_x < NUM_PHONES_X; ++ii_x) {
+        // iterate thru phones
+        for (int ii_y = 0; ii_y < NUM_PHONES_Y; ++ii_y) {
+            // iterate thru beams
+            for (int jj = 0; jj < NUM_BEAMS; ++jj) {
+                angle = (*beams)[jj];
 
-            (*delays)[ii][jj] = (double) (ii * MIC_SEP * cos(angle)) / (double)SPEED_SOUND;
+                phone_idx = ii_x * NUM_PHONES_Y + ii_y;      
+                (*delays)[phone_idx][jj] = (double)(MIC_SEP * ((ii_x * cos(angle)) + (ii_y * sin(angle)))) / (double)SPEED_SOUND;
+            }
         }
     }
 }
