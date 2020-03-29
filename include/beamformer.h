@@ -1,7 +1,7 @@
 #include "main.h"
 #include "fft.h"
 
-#define NUM_BEAMS 129
+#define NUM_BEAMS 65
 
 #define MIC_SEP 0.05    // distance between mics in m
 #define SPEED_SOUND 343.3     // speed of sound in m/s

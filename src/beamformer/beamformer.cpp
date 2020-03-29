@@ -8,8 +8,12 @@ void find_beams(beam_arr *beams) {
      */
 
     for (int ii = 0; ii < NUM_BEAMS; ++ii) {
-        (*beams)[ii] = 2 * M_PI * (double) ii / (double) (NUM_BEAMS);
-//        (*beams)[ii] = acos((double)(NUM_BEAMS/2 - ii) / (double)((NUM_BEAMS - 1)/2)); // angle vector is linear in cosine space
+        if (NUM_PHONES_Y == 1) {
+            (*beams)[ii] = acos((double) (NUM_BEAMS/2 - ii) / (double) ((NUM_BEAMS-1) / 2));
+        }
+        else {
+            (*beams)[ii] = 2 * M_PI * (double) ii / (double) (NUM_BEAMS);
+        }
     }
 }
 

@@ -12,19 +12,20 @@ After the signal is placed in the frequency domain, each bin is multiplied by a 
 
 ## Flexibility
 
-In designing this beamformer, great emphasis was placed on flexibility. With simple changes to `main.h`, this beamformer can be made to work with an arbitrary (>1) number of microphones, number of beams, as well as sample rate and microphone spacing (though the beamformer does assume linear, 1-dimensional microphone spacing).
+In designing this beamformer, great emphasis was placed on flexibility. With simple changes to `main.h`, this beamformer can be made to work with an arbitrary (>1) number of microphones, microphone geometry, number of beams, as well as sample rate and microphone spacing (though the beamformer does assume linear, 1 or 2-dimensional microphone spacing).
 
 ## How do I run this beamformer?
 
-The first step to running the beamformer is to generate test data. To generate test data, follow the following steps:
+The first step to running the beamformer is to generate test data. To generate test data, run the following command:
 
-    1. `cd test_data`
-    2. `python3 test_data_gen.py
-    3. Enter your desired incident angle
+```
+make freq_sweep_gen
+```
 
-> Note: you must have python3 installed on your machine, along with NumPy and Matplotlib (with a QT5 backend)
 
-After generating test data, ensure that you are pointing to the correct file in `main.h`. To do so, check that the filepath under `MIC_1_FILENAME` and `MIC_2_FILENAME` are correct.
+> Note: you must have python3 installed on your machine, along with NumPy.
+
+After generating test data, ensure that the frequencies listed in the `include/main.h` match those generated.
 
 Next, build the project. You can do so by running the command `make build` in the top-level directory. You must have FFTW3 built in order to build the project.
 
