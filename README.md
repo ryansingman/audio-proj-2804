@@ -19,7 +19,7 @@ In designing this beamformer, great emphasis was placed on flexibility. With sim
 The first step to running the beamformer is to generate test data. To generate test data, run the following command:
 
 ```
-make freq_sweep_gen
+make ang_sweep_gen
 ```
 
 
