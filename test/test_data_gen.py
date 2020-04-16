@@ -7,8 +7,7 @@ import matplotlib.pyplot as plt
 import sys
 
 FREQ = 1000                 # signal frequency
-NUM_SAMPS = 256             # number of samples to generate
-NUM_FFT_POINTS = 256
+NUM_SAMPS = 2048            # number of samples to generate
 SAMP_FREQ = 9600            # sampling frequency (in Hz)
 T_STEP = 1 / SAMP_FREQ      # time step (in s)
 

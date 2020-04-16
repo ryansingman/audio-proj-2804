@@ -1,11 +1,12 @@
 #include "main.h"
 
-void read_mic_data(time_arr *mic_data, float *signal_angle) {
+void read_mic_data(time_arr *mic_data, float *signal_angle, int *samp_idx) {
     /*
      * Reads microphone data from file and normalizes
      * Inputs:
      *      mic_data -- microphone data array
      *      signal_angle -- signal angle of data file
+     *      samp_idx -- sample index to start read from
      */
 
     int read_val;
@@ -20,16 +21,28 @@ void read_mic_data(time_arr *mic_data, float *signal_angle) {
         snprintf(mic_filename, string_size, "test/test_data/mic_%d_ang_%.1f.txt", ii+1, *signal_angle);
         mic_data_file = fopen(mic_filename, "r");
 
-        for (int jj = 0; jj < NUM_SAMPS; jj++) {
+        // offset by current sample index
+        fseek(mic_data_file, sizeof(int) * *samp_idx, SEEK_SET);
+
+        for (int jj = 0; jj < NUM_EPOCH_SAMPS; jj++) {
             fscanf(mic_data_file, "%d", &read_val);
             (*mic_data)[ii][jj] = (double) read_val / (double) NORM_FACTOR;
             fscanf(mic_data_file, ",");
         }
         fclose(mic_data_file);
     }
+    *samp_idx += NUM_EPOCH_SAMPS;
 }
 
 bool is_correct(float signal_angle, float truth_angle, beam_arr *beams, int max_power_idx) {
+    /*
+     * Determines if angle calculated matches truth angle
+     * Inputs:
+     *      signal_angle -- calculated signal angle
+     *      truth_angle -- truth signal angle
+     *      beams -- array of beam powers
+     *      max_power_idx -- index of maximum power beam
+     */
 
     float beam_spacing;
     
@@ -99,29 +112,37 @@ int main(void) {
 
     for (float truth_angle = SWEEP_START; truth_angle <= SWEEP_END ; truth_angle += SWEEP_STEP) {
 
-        // read microphone data
-        read_mic_data(mic_data, &truth_angle);
+        int samp_idx = 0;
 
-        // perform fft on data
-        fft(fft_data, mic_data);
+        while (samp_idx <= NUM_SAMPS - NUM_EPOCH_SAMPS) {
 
-        // beamform data
-        memset(bf_data, 0, sizeof(bf_arr));
-        beamform_data(bf_data, fft_data, weights);
+            // read microphone data
+            memset(mic_data, 0, sizeof(time_arr));
+            read_mic_data(mic_data, &truth_angle, &samp_idx);
 
-        // find signal beam
-        find_signal_beam(&max_power_idx, bf_data);
+            // perform fft on data
+            fft(fft_data, mic_data);
 
-        // determine if angle is correct
-        signal_angle = (*beams)[max_power_idx] * 180 / M_PI;
-        bool correct = is_correct(signal_angle, truth_angle, beams, max_power_idx);
+            // beamform data
+            memset(bf_data, 0, sizeof(bf_arr));
+            beamform_data(bf_data, fft_data, weights);
 
-        // display angle 
-//        display_angle(correct, signal_angle, truth_angle);
+            // find signal beam
+            find_signal_beam(&max_power_idx, bf_data);
 
-        if (!correct) {
-            printf(BOLDRED "Test failed " RESET "at truth angle: %.2f ... returned %.2f\n", truth_angle, signal_angle);
-            return -1;
+            // determine if angle is correct
+            signal_angle = (*beams)[max_power_idx] * 180 / M_PI;
+            bool correct = is_correct(signal_angle, truth_angle, beams, max_power_idx);
+
+            // display angle 
+            if (RT_MODE) {
+//                display_angle(correct, signal_angle, truth_angle);
+            }
+
+            if (!correct) {
+                printf(BOLDRED "Test failed " RESET "at truth angle: %.2f ... returned %.2f\n", truth_angle, signal_angle);
+                return -1;
+            }
         }
     }
 

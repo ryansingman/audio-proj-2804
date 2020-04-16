@@ -18,14 +18,14 @@ void ascii_vis(float look_dir) {
     num_col = size.ws_col - 1;      // reserve final column for newline char
     
     // create bool matrix
-    bool bool_mat[num_row][num_col] = { {0} };        // initialize bool matrix with zeros
-    int origin_x = (num_col) / 2, origin_y = num_row;
+    bool bool_mat[num_row][num_col] = { {0} };  // initialize bool matrix with zeros
+    int origin_x = (num_col) / 2, origin_y = num_row/2;
     bool_mat[origin_y][origin_x] = 1;
 
     // fill out character matrix
     int row_idx = origin_y, col_idx = origin_x;
     int r = 1;  // radius
-    while (((num_row >= row_idx) && (row_idx > 0)) && ((num_col > col_idx) && (col_idx > 0))) {
+    while (((num_row > row_idx) && (row_idx > 0)) && ((num_col > col_idx) && (col_idx > 0))) {
         row_idx = origin_y - (r * sin(look_dir_rad))*PIXEL_RATIO;
         col_idx = origin_x + (r * cos(look_dir_rad));
         bool_mat[row_idx][col_idx] = 1;
@@ -44,4 +44,6 @@ void ascii_vis(float look_dir) {
         printf("\n");
     }
     printf("%s", RESET);
+
+
 }
